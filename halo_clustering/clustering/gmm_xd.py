@@ -1,6 +1,7 @@
+from extreme_deconvolution import extreme_deconvolution
+from multiprocessing.pool import Pool, AsyncResult
 import numpy as np
 from .score import bayesian_information_criterion
-from extreme_deconvolution import extreme_deconvolution
 from tqdm import tqdm
 
 
@@ -31,7 +32,7 @@ def generate_initial_guesses(
     return xamp, xmean, xcovar
 
 
-def run_xd(features: np.ndarray, uncertainties: np.ndarray):
+def run_xd(features: np.ndarray, uncertainties: np.ndarray) -> list:
     features_max = np.max(features, axis=0)
     features_min = np.min(features, axis=0)
     err_covar = construct_covar_matrices(uncertainties)
@@ -58,3 +59,50 @@ def run_xd(features: np.ndarray, uncertainties: np.ndarray):
         bics_agg.append(bics)
     print("XD fitting complete")
     return bics_agg
+
+
+def xd_single_component(
+    features: np.ndarray, uncertainties: np.ndarray, n_components: int
+) -> list:
+    features_max = np.max(features, axis=0)
+    features_min = np.min(features, axis=0)
+    err_covar = construct_covar_matrices(uncertainties)
+    sample_number = features.shape[0]
+    print(f"Running XD\n")
+    bics = list()
+    print(f"Attempting to fit {n_components} components...\n")
+    for _ in range(0, 10):
+        xamp, xmean, xcovar = generate_initial_guesses(
+            n_components, features_min, features_max
+        )
+        likelihood = extreme_deconvolution(features, err_covar, xamp, xmean, xcovar)
+        bics.append(
+            (
+                bayesian_information_criterion(
+                    likelihood, n_components, features.shape[1], sample_number
+                ),
+                n_components,
+            )
+        )
+    print(f"Fitting of {n_components} components finished\n")
+    return bics
+
+
+def run_xd_multiprocess(features: np.ndarray, uncertainties: np.ndarray) -> list:
+    bics = list()
+    print(f"Running XD fits in separate processes. One process per component fit\n")
+    max_components = 10
+    with Pool(processes=max_components) as process_pool:
+        async_results = [
+            process_pool.apply_async(
+                xd_single_component, args=(features, uncertainties, n_cmp)
+            )
+            for n_cmp in range(1, max_components + 1)
+        ]
+        process_pool.close()
+        process_pool.join()
+
+        print(f"Fitting completed - all processes terminated. Collecting results.\n")
+        for res in async_results:
+            bics.append(res.get())
+    return bics
