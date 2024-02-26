@@ -1,8 +1,10 @@
 from extreme_deconvolution import extreme_deconvolution
 from multiprocessing.pool import Pool, AsyncResult
 import numpy as np
+from .parallel import get_max_processes
 from .score import bayesian_information_criterion
 from tqdm import tqdm
+import os
 
 
 def construct_covar_matrices(uncertainties: np.ndarray) -> np.ndarray:
@@ -40,7 +42,7 @@ def run_xd(features: np.ndarray, uncertainties: np.ndarray) -> list:
     max_components = 10  # we are attempting to fit max 10 components
     sample_number = features.shape[0]
     print(f"Running XD\n")
-    for components in range(1, max_components):
+    for components in range(1, max_components + 1):
         bics = list()
         print(f"Attempting to fit {components} components\n")
         for _ in tqdm(range(0, 10)):
@@ -70,8 +72,14 @@ def xd_single_component(
     sample_number = features.shape[0]
     print(f"Running XD\n")
     bics = list()
-    print(f"Attempting to fit {n_components} components...\n")
-    for _ in range(0, 10):
+    print(f"Attempting to fit {n_components} components... PID: {os.getpid()}\n")
+    number_of_iterations = 10
+    for i in range(0, number_of_iterations):
+        ## TQDM doesn't render nicely across multiple processes so use old style print statements to signify progress
+        if i % 5 == 0:
+            print(
+                f"Fitting {n_components} components. Iteration number {i} out of {number_of_iterations}"
+            )
         xamp, xmean, xcovar = generate_initial_guesses(
             n_components, features_min, features_max
         )
@@ -92,7 +100,9 @@ def run_xd_multiprocess(features: np.ndarray, uncertainties: np.ndarray) -> list
     bics = list()
     print(f"Running XD fits in separate processes. One process per component fit\n")
     max_components = 10
-    with Pool(processes=max_components) as process_pool:
+    processes = get_max_processes()
+    print(f"Spawning {processes} processes\n")
+    with Pool(processes=processes) as process_pool:
         async_results = [
             process_pool.apply_async(
                 xd_single_component, args=(features, uncertainties, n_cmp)

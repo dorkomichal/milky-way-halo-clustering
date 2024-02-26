@@ -3,6 +3,7 @@ from numpy.typing import NDArray
 import pandas as pd
 from .clustering import preprocessing
 from .clustering import gmm_xd
+from .clustering import parallel
 from .clustering.score import extract_bic_stats
 from .clustering.visualisation import visualise_bic
 import os
@@ -44,5 +45,9 @@ if __name__ == "__main__":
     if not os.path.exists("./output/"):
         os.makedirs("./output/")
     multiprocess = True if args.multiprocess else False
+    if multiprocess:
+        parallel.initialize_multiprocessing()
+    else:
+        os.environ["OMP_NUM_THREADS"] = f"{os.cpu_count()}"
     print(f"Multiprocess value {multiprocess}\n")
     main(args.galah, args.apogee, multiprocess)
