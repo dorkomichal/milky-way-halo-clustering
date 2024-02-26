@@ -1,3 +1,12 @@
+# exclude datasets folder
+base_datasets/
+
+# exclude scratch folder
+scratch/
+
+#exclude output folder
+output/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
