@@ -9,14 +9,16 @@ from .clustering.visualisation import visualise_bic
 import os
 
 
-def xd_and_visualise(features: NDArray, errors: NDArray, multiprocess: bool) -> None:
+def xd_and_visualise(
+    features: NDArray, errors: NDArray, multiprocess: bool, dataset_name: str
+) -> None:
     bics = (
         gmm_xd.run_xd_multiprocess(features, errors)
         if multiprocess
         else gmm_xd.run_xd(features, errors)
     )
     bic_min, bic_max, bic_median = extract_bic_stats(bics)
-    visualise_bic(bic_min, bic_max, bic_median)
+    visualise_bic(bic_min, bic_max, bic_median, dataset_name)
 
 
 def main(galah_filename: str, apogee_filename: str, multiprocess: bool) -> None:
@@ -27,9 +29,9 @@ def main(galah_filename: str, apogee_filename: str, multiprocess: bool) -> None:
     apogee_features, apogee_errors = preprocessing.apogee_preprocess(apogee_df)
     galah_features, galah_errors = preprocessing.galah_preprocess(galah_df)
     print("Fitting GMM to Apogee dataset")
-    xd_and_visualise(apogee_features, apogee_errors, multiprocess)
-    # print("Fitting GMM to Apogee dataset")
-    # xd_and_visualise(galah_features, galah_errors, multiprocess)
+    xd_and_visualise(apogee_features, apogee_errors, multiprocess, "apogee")
+    print("Fitting GMM to Galah dataset")
+    xd_and_visualise(galah_features, galah_errors, multiprocess, "galah")
 
 
 if __name__ == "__main__":

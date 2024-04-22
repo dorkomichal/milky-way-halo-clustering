@@ -21,16 +21,24 @@ def construct_covar_matrices(uncertainties: np.ndarray) -> np.ndarray:
 
 
 def generate_initial_guesses(
-    num_of_components: int, features_min: np.ndarray, features_max: np.ndarray
+    num_of_components: int,
+    features_min: np.ndarray,
+    features_max: np.ndarray,
+    num_features: int,
 ) -> tuple:
     xamp = np.ones(num_of_components) / 2.0
     xmean = np.array(
         [
-            [np.random.uniform(features_min[i], features_max[i]) for i in range(0, 6)]
+            [
+                np.random.uniform(features_min[i], features_max[i])
+                for i in range(0, num_features)
+            ]
             for _ in range(0, num_of_components)
         ]
     )
-    xcovar = np.array([np.diag(np.ones(6)) for _ in range(0, num_of_components)])
+    xcovar = np.array(
+        [np.diag(np.ones(num_features)) for _ in range(0, num_of_components)]
+    )
     return xamp, xmean, xcovar
 
 
@@ -41,19 +49,20 @@ def run_xd(features: np.ndarray, uncertainties: np.ndarray) -> list:
     bics_agg = list()
     max_components = 10  # we are attempting to fit max 10 components
     sample_number = features.shape[0]
+    num_features = features.shape[1]
     print(f"Running XD\n")
     for components in range(1, max_components + 1):
         bics = list()
         print(f"Attempting to fit {components} components\n")
-        for _ in tqdm(range(0, 10)):
+        for _ in tqdm(range(0, 100)):
             xamp, xmean, xcovar = generate_initial_guesses(
-                components, features_min, features_max
+                components, features_min, features_max, num_features
             )
             likelihood = extreme_deconvolution(features, err_covar, xamp, xmean, xcovar)
             bics.append(
                 (
                     bayesian_information_criterion(
-                        likelihood, components, features.shape[1], sample_number
+                        likelihood, components, num_features, sample_number
                     ),
                     components,
                 )
@@ -70,10 +79,11 @@ def xd_single_component(
     features_min = np.min(features, axis=0)
     err_covar = construct_covar_matrices(uncertainties)
     sample_number = features.shape[0]
+    num_features = features.shape[1]
     print(f"Running XD\n")
     bics = list()
     print(f"Attempting to fit {n_components} components... PID: {os.getpid()}\n")
-    number_of_iterations = 10
+    number_of_iterations = 100
     for i in range(0, number_of_iterations):
         ## TQDM doesn't render nicely across multiple processes so use old style print statements to signify progress
         if i % 5 == 0:
@@ -81,13 +91,13 @@ def xd_single_component(
                 f"Fitting {n_components} components. Iteration number {i} out of {number_of_iterations}"
             )
         xamp, xmean, xcovar = generate_initial_guesses(
-            n_components, features_min, features_max
+            n_components, features_min, features_max, num_features
         )
         likelihood = extreme_deconvolution(features, err_covar, xamp, xmean, xcovar)
         bics.append(
             (
                 bayesian_information_criterion(
-                    likelihood, n_components, features.shape[1], sample_number
+                    likelihood, n_components, num_features, sample_number
                 ),
                 n_components,
             )
