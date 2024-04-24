@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import pickle
 
 
 def bayesian_information_criterion(likelihood, n_componets, n_features, n_samples):
@@ -21,3 +22,8 @@ def extract_bic_stats(bics: list) -> tuple:
         bic_median[i] = np.median(bics_stats[i], axis=0)
 
     return (bic_min, bic_max, bic_median)
+
+
+def pickle_bic_stats(bics: list, dataset_name: str) -> None:
+    with open(f"./output/bics_raw_{dataset_name}.pickle", "wb") as pickle_file:
+        pickle.dump(bics, pickle_file)

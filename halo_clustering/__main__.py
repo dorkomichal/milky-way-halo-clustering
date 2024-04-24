@@ -4,8 +4,8 @@ import pandas as pd
 from .clustering import preprocessing
 from .clustering import gmm_xd
 from .clustering import parallel
-from .clustering.score import extract_bic_stats
-from .clustering.visualisation import visualise_bic
+from .clustering.score import extract_bic_stats, pickle_bic_stats
+from .clustering.visualisation import visualise_bic, visualise_bic_with_zoom
 import os
 
 
@@ -17,8 +17,10 @@ def xd_and_visualise(
         if multiprocess
         else gmm_xd.run_xd(features, errors)
     )
+    pickle_bic_stats(bics, dataset_name)
     bic_min, bic_max, bic_median = extract_bic_stats(bics)
     visualise_bic(bic_min, bic_max, bic_median, dataset_name)
+    visualise_bic_with_zoom(bic_min, bic_max, bic_median, dataset_name)
 
 
 def main(galah_filename: str, apogee_filename: str, multiprocess: bool) -> None:
