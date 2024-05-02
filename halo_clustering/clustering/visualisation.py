@@ -18,9 +18,7 @@ def visualise_bic(bic_min, bic_max, bic_median, dataset_name) -> None:
 
 def visualise_bic_with_zoom(bic_min, bic_max, bic_median, dataset_name) -> None:
     plt.clf()
-    fig, ax = plt.subplots()
-    fig.set_figwidth(10)
-    fig.set_figheight(6)
+    _, ax = plt.subplots()
     ax.plot(bic_min.T[1], bic_min.T[0], label="Min BIC")
     ax.plot(bic_median.T[1], bic_median.T[0], linestyle="dashed", label="Median BIC")
     ax.plot(bic_max.T[1], bic_max.T[0], linestyle="dotted", label="Max BIC")
@@ -33,7 +31,7 @@ def visualise_bic_with_zoom(bic_min, bic_max, bic_median, dataset_name) -> None:
     y2_zoom = min_bic_y + 200
 
     # Make the zoom-in plot:
-    axins = zoomed_inset_axes(ax, 1, loc=1)  # zoom = 1
+    axins = zoomed_inset_axes(ax, 1, loc="upper center")  # zoom = 1
     axins.plot(bic_min.T[1], bic_min.T[0])
     axins.set_xlim(x1_zoom, x2_zoom)
     axins.set_ylim(y1_zoom, y2_zoom)

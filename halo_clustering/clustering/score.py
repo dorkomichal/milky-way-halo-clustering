@@ -7,7 +7,7 @@ def bayesian_information_criterion(likelihood, n_componets, n_features, n_sample
     cov_params = n_componets * n_features * (n_features + 1) / 2
     mean_params = n_features * n_componets
     n_parameters = int(cov_params + mean_params + n_componets - 1)
-    return n_parameters * math.log(n_samples) - 2 * likelihood * n_samples
+    return -2 * likelihood * n_samples + n_parameters * math.log(n_samples)
 
 
 def extract_bic_stats(bics: list) -> tuple:
