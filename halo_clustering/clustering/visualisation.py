@@ -34,6 +34,8 @@ def visualise_bic_with_zoom(bic_min, bic_max, bic_median, dataset_name) -> None:
     # Make the zoom-in plot:
     axins = zoomed_inset_axes(ax, 1, loc="upper center")  # zoom = 1
     axins.plot(bic_min.T[1], bic_min.T[0])
+    axins.plot(bic_median.T[1], bic_median.T[0], linestyle="dashed")
+    axins.plot(bic_max.T[1], bic_max.T[0], linestyle="dotted")
     axins.set_xlim(x1_zoom - 0.5, x2_zoom + 0.5)
     axins.set_ylim(y1_zoom, y2_zoom)
     axins.set_xticks([t for t in range(x1_zoom, x2_zoom + 1)])
