@@ -4,23 +4,44 @@ import pandas as pd
 from .clustering import preprocessing
 from .clustering import gmm_xd
 from .clustering import parallel
-from .clustering.score import extract_bic_stats, pickle_bic_stats
-from .clustering.visualisation import visualise_bic, visualise_bic_with_zoom
+from .clustering.score import (
+    best_fit_num_components,
+    process_bic_stats,
+    pickle_bic_stats,
+    pickle_fitted_params,
+    sklearn_gmm_cluster_membership,
+)
+from .clustering.visualisation import (
+    visualise_bic,
+    visualise_bic_with_zoom,
+    visualise_features,
+)
 import os
 
 
 def xd_and_visualise(
-    features: NDArray, errors: NDArray, multiprocess: bool, dataset_name: str
+    features: pd.DataFrame, errors: pd.DataFrame, multiprocess: bool, dataset_name: str
 ) -> None:
-    bics = (
-        gmm_xd.run_xd_multiprocess(features, errors)
+    features_np = features.to_numpy()
+    errors_np = errors.to_numpy()
+    bics, fitted_params = (
+        gmm_xd.run_xd_multiprocess(features_np, errors_np)
         if multiprocess
-        else gmm_xd.run_xd(features, errors)
+        else gmm_xd.run_xd(features_np, errors_np)
     )
     pickle_bic_stats(bics, dataset_name)
-    bic_min, bic_max, bic_median = extract_bic_stats(bics)
+    pickle_fitted_params(fitted_params, dataset_name)
+    bic_min, bic_max, bic_median, arg_min = process_bic_stats(bics)
     visualise_bic(bic_min, bic_max, bic_median, dataset_name)
     visualise_bic_with_zoom(bic_min, bic_max, bic_median, dataset_name)
+    num_components = best_fit_num_components(bic_min)
+    # TODO put these in the table
+    xamp, xmean, xcovar = fitted_params[num_components][int(arg_min[num_components])]
+    features_covar = gmm_xd.construct_covar_matrices(errors_np)
+    cluster_membership = sklearn_gmm_cluster_membership(
+        features_np, features_covar, num_components, xamp, xmean, xcovar
+    )
+    visualise_features(features, cluster_membership, dataset_name)
 
 
 def main(galah_filename: str, apogee_filename: str, multiprocess: bool) -> None:

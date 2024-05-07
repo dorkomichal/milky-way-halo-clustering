@@ -19,8 +19,8 @@ def apogee_preprocess(apogee_df: pd.DataFrame):
         "MG_MN_ERR",
     ]
 
-    features = apogee_df[feature_cols].to_numpy()
-    uncertainties = apogee_df[uncertainties_cols].to_numpy()
+    features = apogee_df[feature_cols]
+    uncertainties = apogee_df[uncertainties_cols]
     return (features, uncertainties)
 
 
@@ -55,6 +55,6 @@ def galah_preprocess(galah_df: pd.DataFrame):
         "e_Ba_fe",
     ]
 
-    features = galah_df[features_cols].to_numpy()
-    uncertainties = galah_df[uncertainties_cols].to_numpy()
+    features = galah_df[features_cols]
+    uncertainties = galah_df[uncertainties_cols]
     return (features, uncertainties)

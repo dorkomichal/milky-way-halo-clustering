@@ -62,12 +62,14 @@ def generate_initial_state_from_sklearn_gmm(features, num_of_components: int) ->
 def run_xd(features: np.ndarray, uncertainties: np.ndarray) -> list:
     err_covar = construct_covar_matrices(uncertainties)
     bics_agg = list()
+    fitted_params_agg = list()
     max_components = 10  # we are attempting to fit max 10 components
     sample_number = features.shape[0]
     num_features = features.shape[1]
     print(f"Running XD\n")
     for components in range(1, max_components + 1):
         bics = list()
+        fitted_params = list()
         print(f"Attempting to fit {components} components\n")
         for _ in tqdm(range(0, 100)):
             xamp, xmean, xcovar = generate_initial_state_from_sklearn_gmm(
@@ -82,9 +84,11 @@ def run_xd(features: np.ndarray, uncertainties: np.ndarray) -> list:
                     components,
                 )
             )
+            fitted_params.append((xamp, xmean, xcovar))
         bics_agg.append(bics)
+        fitted_params_agg.append(fitted_params)
     print("XD fitting complete")
-    return bics_agg
+    return bics_agg, fitted_params_agg
 
 
 def xd_single_component(
@@ -95,6 +99,7 @@ def xd_single_component(
     num_features = features.shape[1]
     print(f"Running XD\n")
     bics = list()
+    fitted_params = list()
     print(f"Attempting to fit {n_components} components... PID: {os.getpid()}\n")
     number_of_iterations = 100
     for i in range(0, number_of_iterations):
@@ -115,12 +120,14 @@ def xd_single_component(
                 n_components,
             )
         )
+        fitted_params.append(xamp, xmean, xcovar)
     print(f"Fitting of {n_components} components finished\n")
-    return bics
+    return bics, fitted_params
 
 
 def run_xd_multiprocess(features: np.ndarray, uncertainties: np.ndarray) -> list:
     bics = list()
+    fitted_params = list()
     print(f"Running XD fits in separate processes. One process per component fit\n")
     max_components = 10
     processes = get_max_processes()
@@ -137,5 +144,7 @@ def run_xd_multiprocess(features: np.ndarray, uncertainties: np.ndarray) -> list
 
         print(f"Fitting completed - all processes terminated. Collecting results.\n")
         for res in async_results:
-            bics.append(res.get())
-    return bics
+            bics_res, fitted_params_res = res.get()
+            bics.append(bics_res)
+            fitted_params.append(fitted_params_res)
+    return bics, fitted_params
