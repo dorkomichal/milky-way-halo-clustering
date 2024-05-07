@@ -120,7 +120,7 @@ def xd_single_component(
                 n_components,
             )
         )
-        fitted_params.append(xamp, xmean, xcovar)
+        fitted_params.append((xamp, xmean, xcovar))
     print(f"Fitting of {n_components} components finished\n")
     return bics, fitted_params
 
