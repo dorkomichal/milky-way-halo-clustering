@@ -3,7 +3,7 @@ import pandas as pd
 
 def apogee_preprocess(apogee_df: pd.DataFrame):
     feature_cols = [
-        "E_84",
+        "E_SCALED",
         "FE_H",
         "ALPHA_FE",
         "AL_FE",
@@ -11,7 +11,7 @@ def apogee_preprocess(apogee_df: pd.DataFrame):
         "MG_MN",
     ]
     uncertainties_cols = [
-        "E_ERR",
+        "E_SCALED_ERR",
         "FE_H_ERR",
         "ALPHA_FE_ERR",
         "AL_FE_ERR",
