@@ -36,8 +36,8 @@ def galah_preprocess(galah_df: pd.DataFrame):
         "Ba_fe",
         "Eu_fe",
         "Mg_cu",
-        "Mn_fe",
-        "Ba_fe",
+        "Mg_mn",
+        "Ba_eu",
     ]
 
     uncertainties_cols = [
@@ -51,8 +51,8 @@ def galah_preprocess(galah_df: pd.DataFrame):
         "e_Ba_fe",
         "e_Eu_fe",
         "e_Mg_cu",
-        "e_Mn_fe",
-        "e_Ba_fe",
+        "e_Mg_mn",
+        "e_Ba_eu",
     ]
 
     features = galah_df[features_cols]
