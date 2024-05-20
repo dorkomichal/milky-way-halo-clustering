@@ -17,7 +17,7 @@ def construct_covar_matrices(uncertainties: np.ndarray) -> np.ndarray:
     it = 0
     for errs in uncertainties:
         covar = np.zeros((n_features, n_features))
-        np.fill_diagonal(covar, errs)
+        np.fill_diagonal(covar, errs**2)
         covariances[it] = covar
         it += 1
     return covariances
