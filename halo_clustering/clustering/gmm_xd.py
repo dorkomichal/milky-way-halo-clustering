@@ -26,7 +26,9 @@ def generate_initial_guesses(
     features_max: np.ndarray,
     num_features: int,
 ) -> tuple:
-    xamp = np.ones(num_of_components) / 2.0
+    xamp = np.random.dirichlet(
+        np.ones(num_of_components)
+    )  # ensure that weights sum to 1
     xmean = np.array(
         [
             [
