@@ -1,13 +1,10 @@
 from extreme_deconvolution import extreme_deconvolution
-from multiprocessing.pool import Pool, AsyncResult
+from multiprocessing.pool import Pool
 import numpy as np
 from .parallel import get_max_processes
-from sklearn.mixture import GaussianMixture
 from .score import bayesian_information_criterion
 from tqdm import tqdm
 import os
-
-import warnings
 
 
 def construct_covar_matrices(uncertainties: np.ndarray) -> np.ndarray:
@@ -23,7 +20,6 @@ def construct_covar_matrices(uncertainties: np.ndarray) -> np.ndarray:
     return covariances
 
 
-# TODO remove if unused (if we end up using scikit-learn GMM to initialise)
 def generate_initial_guesses(
     num_of_components: int,
     features_min: np.ndarray,
@@ -46,20 +42,9 @@ def generate_initial_guesses(
     return xamp, xmean, xcovar
 
 
-# Ref: https://github.com/tholoien/XDGMM/blob/master/xdgmm/xdgmm.py#L143
-def generate_initial_state_from_sklearn_gmm(features, num_of_components: int) -> list:
-    warnings.filterwarnings("ignore", message="Initialization 1 did not converge")
-    skl_gmm = GaussianMixture(
-        n_components=num_of_components, max_iter=10, covariance_type="full"
-    )
-    skl_gmm.fit(features)
-    xamp = skl_gmm.weights_
-    xmean = skl_gmm.means_
-    xcovar = skl_gmm.covariances_
-    return xamp, xmean, xcovar
-
-
 def run_xd(features: np.ndarray, uncertainties: np.ndarray) -> list:
+    features_max = np.max(features, axis=0)
+    features_min = np.min(features, axis=0)
     err_covar = construct_covar_matrices(uncertainties)
     bics_agg = list()
     fitted_params_agg = list()
@@ -72,8 +57,8 @@ def run_xd(features: np.ndarray, uncertainties: np.ndarray) -> list:
         fitted_params = list()
         print(f"Attempting to fit {components} components\n")
         for _ in tqdm(range(0, 100)):
-            xamp, xmean, xcovar = generate_initial_state_from_sklearn_gmm(
-                features, components
+            xamp, xmean, xcovar = generate_initial_guesses(
+                components, features_min, features_max, num_features
             )
             likelihood = extreme_deconvolution(features, err_covar, xamp, xmean, xcovar)
             bics.append(
@@ -94,6 +79,8 @@ def run_xd(features: np.ndarray, uncertainties: np.ndarray) -> list:
 def xd_single_component(
     features: np.ndarray, uncertainties: np.ndarray, n_components: int
 ) -> list:
+    features_max = np.max(features, axis=0)
+    features_min = np.min(features, axis=0)
     err_covar = construct_covar_matrices(uncertainties)
     sample_number = features.shape[0]
     num_features = features.shape[1]
@@ -108,8 +95,8 @@ def xd_single_component(
             print(
                 f"Fitting {n_components} components. Iteration number {i} out of {number_of_iterations}"
             )
-        xamp, xmean, xcovar = generate_initial_state_from_sklearn_gmm(
-            features, n_components
+        xamp, xmean, xcovar = generate_initial_guesses(
+            n_components, features_min, features_max, num_features
         )
         likelihood = extreme_deconvolution(features, err_covar, xamp, xmean, xcovar)
         bics.append(
