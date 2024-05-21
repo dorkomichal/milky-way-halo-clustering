@@ -12,6 +12,7 @@ from .clustering.score import (
     sklearn_gmm_cluster_membership,
 )
 from .clustering.visualisation import (
+    tabulate_components,
     visualise_bic,
     visualise_bic_with_zoom,
     visualise_features,
@@ -35,13 +36,15 @@ def xd_and_visualise(
     visualise_bic(bic_min, bic_max, bic_median, dataset_name)
     visualise_bic_with_zoom(bic_min, bic_max, bic_median, dataset_name)
     num_components = best_fit_num_components(bic_min)
-    # TODO put these in the table
     xamp, xmean, xcovar = fitted_params[num_components][int(arg_min[num_components])]
     features_covar = gmm_xd.construct_covar_matrices(errors_np)
     cluster_membership = sklearn_gmm_cluster_membership(
         features_np, features_covar, num_components, xamp, xmean, xcovar
     )
     visualise_features(features, cluster_membership, dataset_name)
+    tabulate_components(
+        xamp, xmean, xcovar, num_components, features_np.shape[0], dataset_name
+    )
 
 
 def main(galah_filename: str, apogee_filename: str, multiprocess: bool) -> None:

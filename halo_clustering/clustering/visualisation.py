@@ -7,6 +7,7 @@ from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
 from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 import numpy as np
 import pandas as pd
+from tabulate import tabulate
 
 
 def visualise_bic(bic_min, bic_max, bic_median, dataset_name) -> None:
@@ -174,3 +175,64 @@ def visualise_features(
         # TODO plot remaining features
     else:
         raise f"Unknown dataset {dataset_name}"
+
+
+def tabulate_components(
+    xamp: np.ndarray,
+    xmean: np.ndarray,
+    xcovar: np.ndarray,
+    number_components: int,
+    num_samples: int,
+    dataset_name: str,
+) -> None:
+    apogee_feature_cols = [
+        "Energy",
+        "[Fe/H]",
+        "[Alpha/Fe]",
+        "[Al_Fe]",
+        "[Ce/Fe]",
+        "[Mg/Mn]",
+    ]
+
+    galah_feature_cols = [
+        "Energy",
+        "[Fe/H]",
+        "[Alpha/Fe]",
+        "[Na/Fe]",
+        "[Al/Fe]",
+        "[Mn/Fe]",
+        "[Y/Fe]",
+        "[Ba/Fe]",
+        "[Eu/Fe]",
+        "[Mg/Cu]",
+        "[Mg/Mn]",
+        "[Ba/Eu]",
+    ]
+
+    headers = ["Component", "Weight", "Count"]
+    headers_combined = (
+        headers + apogee_feature_cols
+        if dataset_name == "apogee"
+        else headers + galah_feature_cols
+    )
+
+    num_features = (
+        len(apogee_feature_cols)
+        if dataset_name == "apogee"
+        else len(galah_feature_cols)
+    )
+    table = []
+    for i in range(0, number_components):
+        table_means = [
+            f"Component {i}",
+            f"{xamp[i] * 100: .2f} %",
+            int(num_samples * xamp[i]),
+        ]
+        for j in range(0, num_features):
+            table_means.append(f"{xmean[i,j]: .2f} +-{xcovar[i,j,j]**0.5: .2f}")
+        table.append(table_means)
+
+    output = tabulate(table, headers=headers_combined)
+    print(output)
+    with open(f"./output/components_tabulate_{dataset_name}.txt", "w") as out_file:
+        out_file.write(output)
