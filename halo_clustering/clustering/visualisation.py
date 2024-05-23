@@ -20,6 +20,7 @@ def visualise_bic(bic_min, bic_max, bic_median, dataset_name) -> None:
     plt.xlabel("Number of Gaussian components")
     plt.ylabel("BIC")
     plt.savefig(f"./output/bic_figure_{dataset_name}.png", dpi=300, bbox_inches="tight")
+    plt.close()
 
 
 def visualise_bic_with_zoom(bic_min, bic_max, bic_median, dataset_name) -> None:
@@ -53,6 +54,7 @@ def visualise_bic_with_zoom(bic_min, bic_max, bic_median, dataset_name) -> None:
     plt.savefig(
         f"./output/bic_figure_zoom_{dataset_name}.png", dpi=300, bbox_inches="tight"
     )
+    plt.close()
 
 
 # Ref: https://matplotlib.org/stable/gallery/statistics/confidence_ellipse.html
@@ -124,6 +126,7 @@ def __plot_features_by_cluster(
     y_label: str,
     dataset_name: str,
 ) -> None:
+    plt.clf()
     cluster_max = np.max(cluster_membership)
     norm = mpl.colors.Normalize(vmin=0, vmax=cluster_max)
     cluster_colours = [cm.viridis(norm(i)) for i in range(0, cluster_max + 1)]
@@ -149,32 +152,60 @@ def __plot_features_by_cluster(
         dpi=300,
         bbox_inches="tight",
     )
+    plt.close()
+
+
+def __apogee_visualisation_feature_pairs() -> list:
+    return [
+        ("FE_H", "Fe/H", "ALPHA_FE", "\u03b1/Fe"),
+        ("FE_H", "Fe/H", "E_SCALED", "scaled Energy"),
+        ("AL_FE", "Al/Fe", "E_SCALED", "scaled Energy"),
+        ("FE_H", "Fe/H", "CE_FE", "Ce/Fe"),
+        ("FE_H", "Fe/H", "AL_FE", "Al/Fe"),
+        ("AL_FE", "Al/Fe", "MG_MN", "Mg/Mn"),
+    ]
+
+
+def __galah_visualisation_feature_pairs() -> list:
+    return [
+        ("fe_h", "Fe/H", "alpha_fe", "\u03b1/Fe"),
+        ("fe_h", "Fe/H", "scaled_Energy", "scaled Energy"),
+        ("Al_fe", "Al/Fe", "scaled_Energy", "scaled Energy"),
+        ("fe_h", "Fe/H", "Y_fe", "Y/Fe"),
+        ("fe_h", "Fe/H", "Al_fe", "Al/Fe"),
+        ("Al_fe", "Al/Fe", "Mg_mn", "Mg/Mn"),
+        ("fe_h", "Fe/H", "Mn_fe", "Mn/Fe"),
+        ("fe_h", "Fe/H", "Na_fe", "Na/Fe"),
+        ("Na_fe", "Na/Fe", "Mg_cu", "Mg/Cu"),
+        ("fe_h", "Fe/H", "Ba_fe", "Ba/Fe"),
+        ("fe_h", "Fe/H", "Eu_fe", "Eu/Fe"),
+        ("fe_h", "Fe/H", "Ba_eu", "Ba/Eu"),
+    ]
 
 
 def visualise_features(
     features: pd.DataFrame, cluster_membership: np.ndarray, dataset_name: str
 ):
     if dataset_name == "apogee":
-        fe_h_apogee = features["FE_H"]
-        al_fe_apogee = features["AL_FE"]
-        __plot_features_by_cluster(
-            fe_h_apogee, al_fe_apogee, cluster_membership, "Fe/H", "Al/Fe", dataset_name
-        )
-        # TODO plot remaining features
+        visualisation_pairs = __apogee_visualisation_feature_pairs()
     elif dataset_name == "galah":
-        fe_h_galah = features["fe_h"]
-        alpha_fe_galah = features["alpha_fe"]
-        __plot_features_by_cluster(
-            fe_h_galah,
-            alpha_fe_galah,
-            cluster_membership,
-            "Fe/H",
-            "\u03b1/Fe",
-            dataset_name,
-        )
-        # TODO plot remaining features
+        visualisation_pairs = __galah_visualisation_feature_pairs()
     else:
         raise f"Unknown dataset {dataset_name}"
+
+    for pair in visualisation_pairs:
+        x_feature = features[pair[0]]
+        x_display_label = pair[1]
+        y_feature = features[pair[2]]
+        y_display_label = pair[3]
+        __plot_features_by_cluster(
+            x_feature,
+            y_feature,
+            cluster_membership,
+            x_display_label,
+            y_display_label,
+            dataset_name,
+        )
 
 
 def tabulate_components(
@@ -224,7 +255,7 @@ def tabulate_components(
     table = []
     for i in range(0, number_components):
         table_means = [
-            f"Component {i}",
+            f"Component {i + 1}",
             f"{xamp[i] * 100: .2f} %",
             int(num_samples * xamp[i]),
         ]

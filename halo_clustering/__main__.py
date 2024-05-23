@@ -5,7 +5,7 @@ from .clustering import preprocessing
 from .clustering import gmm_xd
 from .clustering import parallel
 from .clustering.score import (
-    best_fit_num_components,
+    best_fit_num_components_idx,
     process_bic_stats,
     pickle_bic_stats,
     pickle_fitted_params,
@@ -35,8 +35,11 @@ def xd_and_visualise(
     bic_min, bic_max, bic_median, arg_min = process_bic_stats(bics)
     visualise_bic(bic_min, bic_max, bic_median, dataset_name)
     visualise_bic_with_zoom(bic_min, bic_max, bic_median, dataset_name)
-    num_components = best_fit_num_components(bic_min)
-    xamp, xmean, xcovar = fitted_params[num_components][int(arg_min[num_components])]
+    num_components_idx = best_fit_num_components_idx(bic_min)
+    num_components = num_components_idx + 1
+    xamp, xmean, xcovar = fitted_params[num_components_idx][
+        int(arg_min[num_components_idx])
+    ]
     features_covar = gmm_xd.construct_covar_matrices(errors_np)
     cluster_membership = sklearn_gmm_cluster_membership(
         features_np, features_covar, num_components, xamp, xmean, xcovar

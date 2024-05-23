@@ -27,7 +27,7 @@ def process_bic_stats(bics: list) -> tuple:
     return (bic_min, bic_max, bic_median, arg_min)
 
 
-def best_fit_num_components(bic_min: np.ndarray) -> int:
+def best_fit_num_components_idx(bic_min: np.ndarray) -> int:
     return int(np.argmin(bic_min, axis=0)[0])
 
 
