@@ -22,8 +22,7 @@ def construct_covar_matrices(uncertainties: np.ndarray) -> np.ndarray:
 
 def generate_initial_guesses(
     num_of_components: int,
-    features_min: np.ndarray,
-    features_max: np.ndarray,
+    features: np.ndarray,
     num_features: int,
 ) -> tuple:
     xamp = np.random.dirichlet(
@@ -31,10 +30,7 @@ def generate_initial_guesses(
     )  # ensure that weights sum to 1
     xmean = np.array(
         [
-            [
-                np.random.uniform(features_min[i], features_max[i])
-                for i in range(0, num_features)
-            ]
+            [np.random.choice(features[:, i]) for i in range(num_features)]
             for _ in range(0, num_of_components)
         ]
     )
@@ -45,8 +41,6 @@ def generate_initial_guesses(
 
 
 def run_xd(features: np.ndarray, uncertainties: np.ndarray) -> list:
-    features_max = np.max(features, axis=0)
-    features_min = np.min(features, axis=0)
     err_covar = construct_covar_matrices(uncertainties)
     bics_agg = list()
     fitted_params_agg = list()
@@ -60,7 +54,7 @@ def run_xd(features: np.ndarray, uncertainties: np.ndarray) -> list:
         print(f"Attempting to fit {components} components\n")
         for _ in tqdm(range(0, 100)):
             xamp, xmean, xcovar = generate_initial_guesses(
-                components, features_min, features_max, num_features
+                components, features, num_features
             )
             likelihood = extreme_deconvolution(features, err_covar, xamp, xmean, xcovar)
             bics.append(
@@ -81,8 +75,6 @@ def run_xd(features: np.ndarray, uncertainties: np.ndarray) -> list:
 def xd_single_component(
     features: np.ndarray, uncertainties: np.ndarray, n_components: int
 ) -> list:
-    features_max = np.max(features, axis=0)
-    features_min = np.min(features, axis=0)
     err_covar = construct_covar_matrices(uncertainties)
     sample_number = features.shape[0]
     num_features = features.shape[1]
@@ -98,7 +90,7 @@ def xd_single_component(
                 f"Fitting {n_components} components. Iteration number {i} out of {number_of_iterations}"
             )
         xamp, xmean, xcovar = generate_initial_guesses(
-            n_components, features_min, features_max, num_features
+            n_components, features, num_features
         )
         likelihood = extreme_deconvolution(features, err_covar, xamp, xmean, xcovar)
         bics.append(
