@@ -11,5 +11,6 @@ dependencies:
   - scipy
   - scikit-learn
   - matplotlib
+  - tabulate
   - tqdm
   - conda=24.1.2
