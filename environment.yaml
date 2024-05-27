@@ -1,0 +1,16 @@
+name: galaxy_halo
+channels:
+  - defaults
+dependencies:
+  - astropy
+  - pandas
+  - ipykernel
+  - python=3.11
+  - numpy
+  - jupyterlab
+  - scipy
+  - scikit-learn
+  - matplotlib
+  - tabulate
+  - tqdm
+  - conda=24.1.2
