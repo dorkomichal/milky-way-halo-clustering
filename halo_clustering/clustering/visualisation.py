@@ -2,11 +2,13 @@ import matplotlib as mpl
 import matplotlib.cm as cm
 from matplotlib.patches import Ellipse
 import matplotlib.pyplot as plt
+from matplotlib.ticker import NullFormatter
 import matplotlib.transforms as transforms
 from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
 from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 import numpy as np
 import pandas as pd
+from sklearn import manifold
 from tabulate import tabulate
 
 
@@ -267,3 +269,51 @@ def tabulate_components(
     print(output)
     with open(f"./output/components_tabulate_{dataset_name}.txt", "w") as out_file:
         out_file.write(output)
+
+
+def __plot_tsne_with_clusters(
+    feature_x: pd.Series,
+    feature_y: pd.Series,
+    cluster_membership: np.ndarray,
+    dataset_name: str,
+    perplexity: int,
+) -> None:
+    plt.clf()
+    cluster_max = np.max(cluster_membership)
+    norm = mpl.colors.Normalize(vmin=0, vmax=cluster_max)
+    _, ax = plt.subplots()
+    ax.scatter(feature_x, feature_y, s=10, c=cluster_membership, norm=norm)
+    ax.xaxis.set_major_formatter(NullFormatter())
+    ax.yaxis.set_major_formatter(NullFormatter())
+    plt.savefig(
+        f"./output/TSNE_{dataset_name}_perplexity_{perplexity}.png",
+        dpi=300,
+        bbox_inches="tight",
+    )
+    plt.close()
+
+
+def visualise_features_tsne(
+    features_np: np.ndarray, cluster_membership: np.ndarray, dataset_name: str
+) -> None:
+    perplexities = [
+        5,
+        30,
+        50,
+        100,
+    ]  # chosen as in https://scikit-learn.org/stable/auto_examples/manifold/plot_t_sne_perplexity.html
+
+    for perplexity in perplexities:
+        tsne = manifold.TSNE(
+            n_components=2,
+            init="random",
+            random_state=42,
+            perplexity=perplexity,
+            n_iter=300,
+        )
+        features_tsne = tsne.fit_transform(features_np)
+        x_feature = features_tsne[:, 0]
+        y_feature = features_tsne[:, 1]
+        __plot_tsne_with_clusters(
+            x_feature, y_feature, cluster_membership, dataset_name, perplexity
+        )
