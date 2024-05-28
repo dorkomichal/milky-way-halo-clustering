@@ -1,4 +1,5 @@
 from extreme_deconvolution import extreme_deconvolution
+from multiprocessing import get_context
 from multiprocessing.pool import Pool
 import numpy as np
 from .parallel import get_max_processes
@@ -113,7 +114,7 @@ def run_xd_multiprocess(features: np.ndarray, uncertainties: np.ndarray) -> list
     max_components = 10
     processes = get_max_processes()
     print(f"Spawning {processes} processes\n")
-    with Pool(processes=processes) as process_pool:
+    with get_context("spawn").Pool(processes=processes) as process_pool:
         async_results = [
             process_pool.apply_async(
                 xd_single_component, args=(features, uncertainties, n_cmp)
