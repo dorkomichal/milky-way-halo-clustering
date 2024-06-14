@@ -120,6 +120,21 @@ def confidence_ellipse(x, y, ax, n_std=3.0, facecolor="none", **kwargs):
     return ax.add_patch(ellipse)
 
 
+def __xkcd_colours_select() -> list:
+    return [
+        "#fd3c06",  # red orange
+        "#bf77f6",  # light purple
+        "#0485d1",  # cerulean
+        "#76cd26",  # apple green
+        "#ff9408",  # tangerine
+        "#b66a50",  # clay
+        "#3d0734",  # aubergine
+        "#fec615",  # golden yellow
+        "#eecffe",  # pale levander
+        "#978a84",  # warm grey
+    ]
+
+
 def __plot_features_by_cluster(
     feature_x: pd.Series,
     feature_y: pd.Series,
@@ -130,10 +145,11 @@ def __plot_features_by_cluster(
 ) -> None:
     plt.clf()
     cluster_max = np.max(cluster_membership)
-    norm = mpl.colors.Normalize(vmin=0, vmax=cluster_max)
-    cluster_colours = [cm.viridis(norm(i)) for i in range(0, cluster_max + 1)]
+    xkcd_colour_list = __xkcd_colours_select()
+    cluster_colours = [xkcd_colour_list[i] for i in range(0, cluster_max + 1)]
+    colour_map = [xkcd_colour_list[cluster[0]] for cluster in cluster_membership]
     _, ax = plt.subplots()
-    ax.scatter(feature_x, feature_y, s=10, c=cluster_membership, norm=norm)
+    ax.scatter(feature_x, feature_y, s=10, c=colour_map)
     for cluster in range(0, cluster_max + 1):
         indices = np.where(cluster_membership == cluster)[0]
         feature_x_cluster = feature_x.iloc[indices]
@@ -279,10 +295,10 @@ def __plot_tsne_with_clusters(
     perplexity: int,
 ) -> None:
     plt.clf()
-    cluster_max = np.max(cluster_membership)
-    norm = mpl.colors.Normalize(vmin=0, vmax=cluster_max)
+    xkcd_colour_list = __xkcd_colours_select()
+    colour_map = [xkcd_colour_list[cluster[0]] for cluster in cluster_membership]
     _, ax = plt.subplots()
-    ax.scatter(feature_x, feature_y, s=10, c=cluster_membership, norm=norm)
+    ax.scatter(feature_x, feature_y, s=10, c=colour_map)
     ax.xaxis.set_major_formatter(NullFormatter())
     ax.yaxis.set_major_formatter(NullFormatter())
     plt.savefig(
