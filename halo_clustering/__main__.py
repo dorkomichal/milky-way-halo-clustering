@@ -38,7 +38,8 @@ def xd_and_visualise(
     visualise_bic_with_zoom(bic_min, bic_max, bic_median, dataset_name)
     num_components_idx = best_fit_num_components_idx(bic_min)
     if dataset_name == "galah":
-        components_idx = [num_components_idx, 3, 4, 5, 6]
+        # due to low data resolution resulting in best BIC for 3 components also visualise 4 and 5 components for Galah
+        components_idx = [num_components_idx, 3, 4]
     else:
         components_idx = [num_components_idx]
 
