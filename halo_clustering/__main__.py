@@ -37,19 +37,24 @@ def xd_and_visualise(
     visualise_bic(bic_min, bic_max, bic_median, dataset_name)
     visualise_bic_with_zoom(bic_min, bic_max, bic_median, dataset_name)
     num_components_idx = best_fit_num_components_idx(bic_min)
-    num_components = num_components_idx + 1
-    xamp, xmean, xcovar = fitted_params[num_components_idx][
-        int(arg_min[num_components_idx])
-    ]
-    features_covar = gmm_xd.construct_covar_matrices(errors_np)
-    cluster_membership = sklearn_gmm_cluster_membership(
-        features_np, features_covar, num_components, xamp, xmean, xcovar
-    )
-    visualise_features(features, cluster_membership, dataset_name)
-    tabulate_components(
-        xamp, xmean, xcovar, num_components, features_np.shape[0], dataset_name
-    )
-    visualise_features_tsne(features_np, cluster_membership, dataset_name)
+    if dataset_name == "galah":
+        # due to low data resolution resulting in best BIC for 3 components also visualise 4 and 5 components for Galah
+        components_idx = [num_components_idx, 3, 4]
+    else:
+        components_idx = [num_components_idx]
+
+    for component_idx in components_idx:
+        num_components = component_idx + 1
+        xamp, xmean, xcovar = fitted_params[component_idx][int(arg_min[component_idx])]
+        features_covar = gmm_xd.construct_covar_matrices(errors_np)
+        cluster_membership = sklearn_gmm_cluster_membership(
+            features_np, features_covar, num_components, xamp, xmean, xcovar
+        )
+        visualise_features(features, cluster_membership, num_components, dataset_name)
+        tabulate_components(
+            xamp, xmean, xcovar, num_components, features_np.shape[0], dataset_name
+        )
+        visualise_features_tsne(features_np, cluster_membership, dataset_name)
 
 
 def main(galah_filename: str, apogee_filename: str, multiprocess: bool) -> None:

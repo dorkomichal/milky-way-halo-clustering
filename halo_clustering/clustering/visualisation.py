@@ -141,6 +141,7 @@ def __plot_features_by_cluster(
     cluster_membership: np.ndarray,
     x_label: str,
     y_label: str,
+    num_of_components: int,
     dataset_name: str,
 ) -> None:
     plt.clf()
@@ -166,7 +167,7 @@ def __plot_features_by_cluster(
     x_feature_filename = x_label.replace("/", "")
     y_feature_filename = y_label.replace("/", "")
     plt.savefig(
-        f"./output/clusters_{dataset_name}_{x_feature_filename}_{y_feature_filename}.png",
+        f"./output/clusters_{dataset_name}_{num_of_components}components_{x_feature_filename}_{y_feature_filename}.png",
         dpi=300,
         bbox_inches="tight",
     )
@@ -202,7 +203,10 @@ def __galah_visualisation_feature_pairs() -> list:
 
 
 def visualise_features(
-    features: pd.DataFrame, cluster_membership: np.ndarray, dataset_name: str
+    features: pd.DataFrame,
+    cluster_membership: np.ndarray,
+    num_of_components: int,
+    dataset_name: str,
 ):
     if dataset_name == "apogee":
         visualisation_pairs = __apogee_visualisation_feature_pairs()
@@ -222,6 +226,7 @@ def visualise_features(
             cluster_membership,
             x_display_label,
             y_display_label,
+            num_of_components,
             dataset_name,
         )
 
@@ -283,7 +288,9 @@ def tabulate_components(
 
     output = tabulate(table, headers=headers_combined)
     print(output)
-    with open(f"./output/components_tabulate_{dataset_name}.txt", "w") as out_file:
+    with open(
+        f"./output/components{number_components}_tabulate_{dataset_name}.txt", "w"
+    ) as out_file:
         out_file.write(output)
 
 
