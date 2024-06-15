@@ -298,6 +298,7 @@ def __plot_tsne_with_clusters(
     feature_x: pd.Series,
     feature_y: pd.Series,
     cluster_membership: np.ndarray,
+    num_components: int,
     dataset_name: str,
     perplexity: int,
 ) -> None:
@@ -309,7 +310,7 @@ def __plot_tsne_with_clusters(
     ax.xaxis.set_major_formatter(NullFormatter())
     ax.yaxis.set_major_formatter(NullFormatter())
     plt.savefig(
-        f"./output/TSNE_{dataset_name}_perplexity_{perplexity}.png",
+        f"./output/TSNE_{dataset_name}_{num_components}components_perplexity_{perplexity}.png",
         dpi=300,
         bbox_inches="tight",
     )
@@ -317,7 +318,10 @@ def __plot_tsne_with_clusters(
 
 
 def visualise_features_tsne(
-    features_np: np.ndarray, cluster_membership: np.ndarray, dataset_name: str
+    features_np: np.ndarray,
+    cluster_membership: np.ndarray,
+    num_components: int,
+    dataset_name: str,
 ) -> None:
     perplexities = [
         5,
@@ -338,5 +342,10 @@ def visualise_features_tsne(
         x_feature = features_tsne[:, 0]
         y_feature = features_tsne[:, 1]
         __plot_tsne_with_clusters(
-            x_feature, y_feature, cluster_membership, dataset_name, perplexity
+            x_feature,
+            y_feature,
+            cluster_membership,
+            num_components,
+            dataset_name,
+            perplexity,
         )
