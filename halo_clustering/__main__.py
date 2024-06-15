@@ -54,7 +54,9 @@ def xd_and_visualise(
         tabulate_components(
             xamp, xmean, xcovar, num_components, features_np.shape[0], dataset_name
         )
-        visualise_features_tsne(features_np, cluster_membership, dataset_name)
+        visualise_features_tsne(
+            features_np, cluster_membership, num_components, dataset_name
+        )
 
 
 def main(galah_filename: str, apogee_filename: str, multiprocess: bool) -> None:
