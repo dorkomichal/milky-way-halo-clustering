@@ -41,7 +41,7 @@ def xd_and_visualise(
         # due to low data resolution resulting in best BIC for 3 components also visualise 4 and 5 components for Galah
         components_idx = [num_components_idx, 3, 4]
     else:
-        components_idx = [num_components_idx]
+        components_idx = [num_components_idx, 5, 6]
 
     for component_idx in components_idx:
         num_components = component_idx + 1

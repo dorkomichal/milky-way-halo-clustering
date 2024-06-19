@@ -4,10 +4,10 @@ import pickle
 from sklearn.mixture import GaussianMixture
 
 
-def bayesian_information_criterion(likelihood, n_componets, n_features, n_samples):
-    cov_params = n_componets * n_features * (n_features + 1) / 2
-    mean_params = n_features * n_componets
-    n_parameters = int(cov_params + mean_params + n_componets - 1)
+def bayesian_information_criterion(likelihood, n_components, n_features, n_samples):
+    cov_params = n_components * n_features * (n_features + 1) / 2
+    mean_params = n_features * n_components
+    n_parameters = int(cov_params + mean_params + n_components - 1)
     return -2 * likelihood * n_samples + n_parameters * math.log(n_samples)
 
 
