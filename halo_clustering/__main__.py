@@ -39,9 +39,19 @@ def xd_and_visualise(
     num_components_idx = best_fit_num_components_idx(bic_min)
     if dataset_name == "galah":
         # due to low data resolution resulting in best BIC for 3 components also visualise 4 and 5 components for Galah
-        components_idx = [num_components_idx, 3, 4]
+        components_idx = [
+            num_components_idx,
+            num_components_idx + 1,
+            num_components_idx + 2,
+        ]
     else:
-        components_idx = [num_components_idx, 5, 6]
+        # Apogee 2d projection for the favoured number of components and -1,+1,+2 components around the favoured
+        components_idx = [
+            num_components_idx - 1,
+            num_components_idx,
+            num_components_idx + 1,
+            num_components_idx + 2,
+        ]
 
     for component_idx in components_idx:
         num_components = component_idx + 1
