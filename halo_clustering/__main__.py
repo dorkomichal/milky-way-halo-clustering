@@ -17,6 +17,7 @@ from .clustering.visualisation import (
     visualise_bic_with_zoom,
     visualise_features,
     visualise_features_tsne,
+    visualise_features_umap,
 )
 import os
 
@@ -39,9 +40,19 @@ def xd_and_visualise(
     num_components_idx = best_fit_num_components_idx(bic_min)
     if dataset_name == "galah":
         # due to low data resolution resulting in best BIC for 3 components also visualise 4 and 5 components for Galah
-        components_idx = [num_components_idx, 3, 4]
+        components_idx = [
+            num_components_idx,
+            num_components_idx + 1,
+            num_components_idx + 2,
+        ]
     else:
-        components_idx = [num_components_idx]
+        # Apogee 2d projection for the favoured number of components and -1,+1,+2 components around the favoured
+        components_idx = [
+            num_components_idx - 1,
+            num_components_idx,
+            num_components_idx + 1,
+            num_components_idx + 2,
+        ]
 
     for component_idx in components_idx:
         num_components = component_idx + 1
@@ -55,6 +66,9 @@ def xd_and_visualise(
             xamp, xmean, xcovar, num_components, features_np.shape[0], dataset_name
         )
         visualise_features_tsne(
+            features_np, cluster_membership, num_components, dataset_name
+        )
+        visualise_features_umap(
             features_np, cluster_membership, num_components, dataset_name
         )
 

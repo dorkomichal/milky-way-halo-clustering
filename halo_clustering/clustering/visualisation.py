@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 from sklearn import manifold
 from tabulate import tabulate
+import umap
 
 
 def visualise_bic(bic_min, bic_max, bic_median, dataset_name) -> None:
@@ -349,3 +350,49 @@ def visualise_features_tsne(
             dataset_name,
             perplexity,
         )
+
+
+def __plot_umap_with_clusters(
+    feature_x: pd.Series,
+    feature_y: pd.Series,
+    cluster_membership: np.ndarray,
+    num_components: int,
+    dataset_name: str,
+) -> None:
+    plt.clf()
+    xkcd_colour_list = __xkcd_colours_select()
+    colour_map = [xkcd_colour_list[cluster[0]] for cluster in cluster_membership]
+    _, ax = plt.subplots()
+    ax.scatter(feature_x, feature_y, s=10, c=colour_map)
+    ax.xaxis.set_major_formatter(NullFormatter())
+    ax.yaxis.set_major_formatter(NullFormatter())
+    plt.savefig(
+        f"./output/UMAP_{dataset_name}_{num_components}_clusters.png",
+        dpi=300,
+        bbox_inches="tight",
+    )
+    plt.close()
+
+
+def visualise_features_umap(
+    features_np: np.ndarray,
+    cluster_membership: np.ndarray,
+    num_components: int,
+    dataset_name: str,
+) -> None:
+    umap_mapper = umap.UMAP(
+        n_components=2,
+        init="spectral",
+        learning_rate=1.0,
+        local_connectivity=1.0,
+        low_memory=False,
+        metric="euclidean",
+        random_state=42,
+        n_jobs=1,
+    )
+    features_umap = umap_mapper.fit_transform(features_np)
+    x_feature = features_umap[:, 0]
+    y_feature = features_umap[:, 1]
+    __plot_umap_with_clusters(
+        x_feature, y_feature, cluster_membership, num_components, dataset_name
+    )
