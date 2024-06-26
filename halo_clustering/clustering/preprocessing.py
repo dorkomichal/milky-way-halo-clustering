@@ -1,7 +1,15 @@
 import pandas as pd
 
 
-def apogee_preprocess(apogee_df: pd.DataFrame):
+def apogee_preprocess(apogee_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Extract set of columns from APOGEE-Gaia dataset
+
+    Args:
+        apogee_df (pd.DataFrame): APOGEE-Gaia dataset
+
+    Returns:
+        tuple[pd.DataFrame, pd.DataFrame]: features and uncertainties
+    """
     feature_cols = [
         "E_SCALED",
         "FE_H",
@@ -24,7 +32,15 @@ def apogee_preprocess(apogee_df: pd.DataFrame):
     return (features, uncertainties)
 
 
-def galah_preprocess(galah_df: pd.DataFrame):
+def galah_preprocess(galah_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Extract set of columns from GALAH-Gaia dataset
+
+    Args:
+        galah_df (pd.DataFrame): GALAH-Gaia dataset
+
+    Returns:
+       tuple[pd.DataFrame, pd.DataFrame]: features and uncertainties
+    """
     features_cols = [
         "scaled_Energy",
         "fe_h",

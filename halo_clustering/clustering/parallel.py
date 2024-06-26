@@ -4,6 +4,9 @@ MAX_PARALLEL_PROCESSES = 1
 
 
 def initialize_multiprocessing():
+    """Initialise number of OpenMP threads and number of processes to use
+    for multiprocess fitting
+    """
     # Attempt to initialise with some sensible values
     global MAX_PARALLEL_PROCESSES
     cpu_count = os.cpu_count()
