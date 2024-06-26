@@ -1,7 +1,5 @@
 FROM python:3.11
 
-# RUN apk upgrade --update \
- #   && apk add gcc g++ gsl
 RUN apt-get update && apt-get install g++ gcc libgsl0-dev 
 RUN mkdir /home/docker_user
 WORKDIR /home/docker_user/md2018
