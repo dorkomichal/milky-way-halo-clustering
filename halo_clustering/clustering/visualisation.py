@@ -13,7 +13,18 @@ from tabulate import tabulate
 import umap
 
 
-def visualise_bic(bic_min, bic_max, bic_median, dataset_name) -> None:
+def visualise_bic(
+    bic_min: np.ndarray, bic_max: np.ndarray, bic_median: np.ndarray, dataset_name: str
+) -> None:
+    """Visualise min, median and max BIC scores
+
+    Saves figure into output file
+    Args:
+        bic_min (np.ndarray): min BIC for each component
+        bic_max (np.ndarray): max BIC for each component
+        bic_median (np.ndarray): median BIC for each component
+        dataset_name (str): dataset name
+    """
     plt.clf()
     plt.plot(bic_min.T[1], bic_min.T[0], label="Min BIC")
     plt.plot(bic_median.T[1], bic_median.T[0], linestyle="dashed", label="Median BIC")
@@ -26,7 +37,18 @@ def visualise_bic(bic_min, bic_max, bic_median, dataset_name) -> None:
     plt.close()
 
 
-def visualise_bic_with_zoom(bic_min, bic_max, bic_median, dataset_name) -> None:
+def visualise_bic_with_zoom(
+    bic_min: np.ndarray, bic_max: np.ndarray, bic_median: np.ndarray, dataset_name: str
+) -> None:
+    """Visualise min, median and max BIC scores zooming around min score
+
+    Saves figure into output file
+    Args:
+        bic_min (np.ndarray): min BIC for each component
+        bic_max (np.ndarray): max BIC for each component
+        bic_median (np.ndarray): median BIC for each component
+        dataset_name (str): dataset name
+    """
     plt.clf()
     _, ax = plt.subplots()
     ax.plot(bic_min.T[1], bic_min.T[0], label="Min BIC")
@@ -122,6 +144,11 @@ def confidence_ellipse(x, y, ax, n_std=3.0, facecolor="none", **kwargs):
 
 
 def __xkcd_colours_select() -> list:
+    """Get list of handpicked colours that are contrasting
+
+    Returns:
+        list: list of contrasting colours
+    """
     return [
         "#fd3c06",  # red orange
         "#bf77f6",  # light purple
@@ -145,6 +172,18 @@ def __plot_features_by_cluster(
     num_of_components: int,
     dataset_name: str,
 ) -> None:
+    """Plot x, y features and colour datapoints based on cluster membership
+
+    Additionally draws confidence ellipse at 2-sigma
+    Args:
+        feature_x (pd.Series): feature on x-axis
+        feature_y (pd.Series): feature on y-axis
+        cluster_membership (np.ndarray): array of cluster memberships
+        x_label (str): label for x-axis
+        y_label (str): label for y-axis
+        num_of_components (int): number of fitted components
+        dataset_name (str): name of dataset fitted
+    """
     plt.clf()
     cluster_max = np.max(cluster_membership)
     xkcd_colour_list = __xkcd_colours_select()
@@ -176,6 +215,11 @@ def __plot_features_by_cluster(
 
 
 def __apogee_visualisation_feature_pairs() -> list:
+    """Get list of pairs of features and axis labels for apogee dataset
+
+    Returns:
+        list: pairs of features and axis labels
+    """
     return [
         ("FE_H", "Fe/H", "ALPHA_FE", "\u03b1/Fe"),
         ("FE_H", "Fe/H", "E_SCALED", "scaled Energy"),
@@ -187,6 +231,11 @@ def __apogee_visualisation_feature_pairs() -> list:
 
 
 def __galah_visualisation_feature_pairs() -> list:
+    """Get list of pairs of features and axis labels for galah dataset
+
+    Returns:
+        list: pairs of features and axis labels
+    """
     return [
         ("fe_h", "Fe/H", "alpha_fe", "\u03b1/Fe"),
         ("fe_h", "Fe/H", "scaled_Energy", "scaled Energy"),
@@ -208,7 +257,19 @@ def visualise_features(
     cluster_membership: np.ndarray,
     num_of_components: int,
     dataset_name: str,
-):
+) -> None:
+    """Visualise features as 2-dimensional chemodynamical projections
+
+    Produce scatter plots and save them into the file
+    Args:
+        features (pd.DataFrame): features to visualise
+        cluster_membership (np.ndarray): cluster membership of each point in the dataset
+        num_of_components (int): number of components fitted into the dataset
+        dataset_name (str): name of the dataset
+
+    Raises:
+        f: exception if provided unsupported dataset
+    """
     if dataset_name == "apogee":
         visualisation_pairs = __apogee_visualisation_feature_pairs()
     elif dataset_name == "galah":
@@ -240,6 +301,17 @@ def tabulate_components(
     num_samples: int,
     dataset_name: str,
 ) -> None:
+    """Produce table listing all features (mean and sigma), count and weight by component
+
+    Saves table into text file
+    Args:
+        xamp (np.ndarray): amplitudes fitted by XD
+        xmean (np.ndarray): means fitted by XD
+        xcovar (np.ndarray): covariances fitted by XD
+        number_components (int): number of components fitted
+        num_samples (int): number of samples
+        dataset_name (str): name of the dataset
+    """
     apogee_feature_cols = [
         "Energy",
         "[Fe/H]",
@@ -303,6 +375,17 @@ def __plot_tsne_with_clusters(
     dataset_name: str,
     perplexity: int,
 ) -> None:
+    """Plot t-SNE projection with data points coloured by cluster membership
+
+    Save figure into output file
+    Args:
+        feature_x (pd.Series): embedding on x-axis
+        feature_y (pd.Series): embedding on x-axis
+        cluster_membership (np.ndarray): cluster membership
+        num_components (int): number of components
+        dataset_name (str): datase name
+        perplexity (int): perplexity hyperparam used (for file name)
+    """
     plt.clf()
     xkcd_colour_list = __xkcd_colours_select()
     colour_map = [xkcd_colour_list[cluster[0]] for cluster in cluster_membership]
@@ -324,6 +407,16 @@ def visualise_features_tsne(
     num_components: int,
     dataset_name: str,
 ) -> None:
+    """Compute t-SNE embedding for the provided features and plot them
+
+    Saves figures into file.
+    Applies perplexities [5, 30, 50, 100]
+    Args:
+        features_np (np.ndarray): features to compute t-SNE embedding for
+        cluster_membership (np.ndarray): cluster membership of datapoints
+        num_components (int): number of components fitted into the data
+        dataset_name (str): name of the dataset
+    """
     perplexities = [
         5,
         30,
@@ -359,6 +452,16 @@ def __plot_umap_with_clusters(
     num_components: int,
     dataset_name: str,
 ) -> None:
+    """Plot UMAP projection with data points coloured by cluster membership
+
+    Save figure into output file
+    Args:
+        feature_x (pd.Series): embedding on x-axis
+        feature_y (pd.Series): embedding on x-axis
+        cluster_membership (np.ndarray): cluster membership
+        num_components (int): number of components
+        dataset_name (str): datase name
+    """
     plt.clf()
     xkcd_colour_list = __xkcd_colours_select()
     colour_map = [xkcd_colour_list[cluster[0]] for cluster in cluster_membership]
@@ -380,6 +483,15 @@ def visualise_features_umap(
     num_components: int,
     dataset_name: str,
 ) -> None:
+    """Compute UMAP embedding for the provided features and plot them
+
+    Saves figures into file.
+    Args:
+        features_np (np.ndarray): features to compute t-SNE embedding for
+        cluster_membership (np.ndarray): cluster membership of datapoints
+        num_components (int): number of components fitted into the data
+        dataset_name (str): name of the dataset
+    """
     umap_mapper = umap.UMAP(
         n_components=2,
         init="spectral",

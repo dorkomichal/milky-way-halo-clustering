@@ -25,6 +25,17 @@ import os
 def xd_and_visualise(
     features: pd.DataFrame, errors: pd.DataFrame, multiprocess: bool, dataset_name: str
 ) -> None:
+    """Run XD fitting and visualise fitted clusters together with t-SNE and UMAP embedding
+
+    Uses pre-defined 2-dimensional projections of chemodynamical space
+    Plots not only best fit but additional components around the best fit
+
+    Args:
+        features (pd.DataFrame): features for the dataset to fit
+        errors (pd.DataFrame): errors on measurements for the dataset
+        multiprocess (bool): run XD fit in single process or across multiple processes
+        dataset_name (str): name of dataset to fit
+    """
     features_np = features.to_numpy()
     errors_np = errors.to_numpy()
     bics, fitted_params = (
@@ -74,6 +85,13 @@ def xd_and_visualise(
 
 
 def main(galah_filename: str, apogee_filename: str, multiprocess: bool) -> None:
+    """Main entrypoint - preprocess the dataset and run XD fitting + visualise fitted data
+
+    Args:
+        galah_filename (str): name of the file with galah dataset
+        apogee_filename (str): name of the file with apogee dataset
+        multiprocess (bool): run XD fit in single process or across multiple processes
+    """
     print(f"Loading Galah dataset from {galah_filename}\n")
     galah_df = pd.read_csv(galah_filename)
     print(f"Loading Apogee dataset from {apogee_filename}\n")
