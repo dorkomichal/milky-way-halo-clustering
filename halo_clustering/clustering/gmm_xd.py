@@ -13,6 +13,7 @@ def construct_covar_matrices(uncertainties: np.ndarray) -> np.ndarray:
 
     Construct covariance matrix for features corresponding to
     each sample/measurement
+
     Args:
         uncertainties (np.ndarray): measurement uncertainties
 
@@ -41,6 +42,7 @@ def generate_initial_guesses(
     Values are generated as follows:
     mean - mean is initialised to one of the datapoints in the samples
     amplitude - from Dirichlet distribution sums to 1
+
     Args:
         num_of_components (int): number of components fitting
         features (np.ndarray): set of features being fitted
@@ -71,6 +73,7 @@ def run_xd(features: np.ndarray, uncertainties: np.ndarray) -> list:
     Performs 100 fits for each number of components
     Stores updated amplitudes, means and covariances after each fit
     Evaluates BIC score of each fit
+
     Args:
         features (np.ndarray): features to fit
         uncertainties (np.ndarray): errors on measurement
@@ -116,6 +119,7 @@ def xd_single_component(
 
     Stores updated amplitudes, means and covariances after each fit
     Evaluates BIC score of each fit
+
     Args:
         features (np.ndarray): features to fit
         uncertainties (np.ndarray): errors on measurement
@@ -159,6 +163,7 @@ def run_xd_multiprocess(features: np.ndarray, uncertainties: np.ndarray) -> list
     """Runs XD fitting asynchronously across 10 different components each in a separate process
 
     Uses Process Pool to run fitting in multiple parallel processes
+    
     Args:
         features (np.ndarray): features to fit
         uncertainties (np.ndarray): errors on measurement
