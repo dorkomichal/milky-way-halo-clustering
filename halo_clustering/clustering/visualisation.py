@@ -19,6 +19,7 @@ def visualise_bic(
     """Visualise min, median and max BIC scores
 
     Saves figure into output file
+
     Args:
         bic_min (np.ndarray): min BIC for each component
         bic_max (np.ndarray): max BIC for each component
@@ -43,6 +44,7 @@ def visualise_bic_with_zoom(
     """Visualise min, median and max BIC scores zooming around min score
 
     Saves figure into output file
+
     Args:
         bic_min (np.ndarray): min BIC for each component
         bic_max (np.ndarray): max BIC for each component
@@ -175,6 +177,7 @@ def __plot_features_by_cluster(
     """Plot x, y features and colour datapoints based on cluster membership
 
     Additionally draws confidence ellipse at 2-sigma
+
     Args:
         feature_x (pd.Series): feature on x-axis
         feature_y (pd.Series): feature on y-axis
@@ -261,6 +264,7 @@ def visualise_features(
     """Visualise features as 2-dimensional chemodynamical projections
 
     Produce scatter plots and save them into the file
+
     Args:
         features (pd.DataFrame): features to visualise
         cluster_membership (np.ndarray): cluster membership of each point in the dataset
@@ -304,6 +308,7 @@ def tabulate_components(
     """Produce table listing all features (mean and sigma), count and weight by component
 
     Saves table into text file
+
     Args:
         xamp (np.ndarray): amplitudes fitted by XD
         xmean (np.ndarray): means fitted by XD
@@ -378,6 +383,7 @@ def __plot_tsne_with_clusters(
     """Plot t-SNE projection with data points coloured by cluster membership
 
     Save figure into output file
+
     Args:
         feature_x (pd.Series): embedding on x-axis
         feature_y (pd.Series): embedding on x-axis
@@ -411,6 +417,7 @@ def visualise_features_tsne(
 
     Saves figures into file.
     Applies perplexities [5, 30, 50, 100]
+
     Args:
         features_np (np.ndarray): features to compute t-SNE embedding for
         cluster_membership (np.ndarray): cluster membership of datapoints
@@ -455,6 +462,7 @@ def __plot_umap_with_clusters(
     """Plot UMAP projection with data points coloured by cluster membership
 
     Save figure into output file
+
     Args:
         feature_x (pd.Series): embedding on x-axis
         feature_y (pd.Series): embedding on x-axis
@@ -486,6 +494,7 @@ def visualise_features_umap(
     """Compute UMAP embedding for the provided features and plot them
 
     Saves figures into file.
+
     Args:
         features_np (np.ndarray): features to compute t-SNE embedding for
         cluster_membership (np.ndarray): cluster membership of datapoints
